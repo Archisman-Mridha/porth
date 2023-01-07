@@ -55,37 +55,27 @@
                 global _start
                 _start:
             
-                    ;; pushing 34 to the stack
-                    push 34
+                    ;; pushing 2 to the stack
+                    push 2
 
                 
-                    ;; pushing 35 to the stack
-                    push 35
+                    ;; pushing 1 to the stack
+                    push 1
 
                 
-                    ;; performing plus operation
-                    pop rax
-                    pop rbx
-                    add rax, rbx
-                    push rax
-                    
-                    ;; pushing 68 to the stack
-                    push 68
-
-                
-                    ;; performing equality comparison operation
+                    ;; performing greater than comparison operation
                     mov rcx, 0
                     mov rdx, 1
-                    pop rax
                     pop rbx
+                    pop rax
                     cmp rax, rbx
-                    cmove rcx, rdx
+                    cmovg rcx, rdx
                     push rcx
                     
                     ;; handling if block
                     pop rax
                     test rax, rax
-                    jz addr_9
+                    jz addr_6
                     
                     ;; pushing 1 to the stack
                     push 1
@@ -95,20 +85,8 @@
                     pop rdi
                     call dump
                     
-                ;; handling else statement
-                    jmp addr_11
-                addr_9:
-                    
-                    ;; pushing 0 to the stack
-                    push 0
-
-                
-                    ;; performing dump operation
-                    pop rdi
-                    call dump
-                    
                 ;; handling end statement
-                addr_11:
+                addr_6:
                     
 
                     mov rax, 60

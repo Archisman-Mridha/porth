@@ -24,6 +24,8 @@ EQUALITY_COMPARISON_OPERATION= iota( )
 IF_OPERATION= iota( )
 ELSE_OPERATION= iota( )
 BLOCK_END_OPERATION= iota( )
+DUP_OPERATION= iota( ) #* `dup` operation, creates a duplicate of the value at the top of the stack and pushes that duplicate to the top of the stack
+GREATER_THAN_COMPARISON_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -50,8 +52,14 @@ def createElseOperation( ):
 def createBlockEndOperation( ):
     return (BLOCK_END_OPERATION, )
 
+def createDupOperation( ):
+    return (DUP_OPERATION, )
+
+def createGreaterThanComparisonOperation( ):
+    return (GREATER_THAN_COMPARISON_OPERATION, )
+
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 8, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 10, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -75,6 +83,12 @@ def parseTokenAsPorthOperation(token):
 
     elif word == 'end':
         return createBlockEndOperation( )
+
+    elif word == 'dup':
+        return createDupOperation( )
+
+    elif word == '>':
+        return createGreaterThanComparisonOperation( )
 
     else:
         try:
@@ -161,7 +175,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for index in range(len(program)):
-            assert OPERATION_COUNT == 8, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert OPERATION_COUNT == 10, "exhaustive handling of operation types in compilePorthProgram( )"
 
             instruction= program[index]
 
@@ -208,8 +222,8 @@ def compilePorthProgram(program):
                     ;; performing equality comparison operation
                     mov rcx, 0
                     mov rdx, 1
-                    pop rax
                     pop rbx
+                    pop rax
                     cmp rax, rbx
                     cmove rcx, rdx
                     push rcx
@@ -243,6 +257,30 @@ def compilePorthProgram(program):
                 ;; handling end statement
                 addr_%d:
                     """ % index
+                )
+
+            elif instruction[0] == DUP_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                    ;; performing dup operation
+                    pop rax
+                    push rax
+                    push rax
+                    """
+                )
+
+            elif instruction[0] == GREATER_THAN_COMPARISON_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                    ;; performing greater than comparison operation
+                    mov rcx, 0
+                    mov rdx, 1
+                    pop rbx
+                    pop rax
+                    cmp rax, rbx
+                    cmovg rcx, rdx
+                    push rcx
+                    """
                 )
 
             else:
