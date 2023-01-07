@@ -1,5 +1,6 @@
 import sys
 import subprocess
+import lexer
 
 iotaCounter= 0
 
@@ -33,8 +34,10 @@ def createMinusPlusOperation( ):
 def createDumpOperation( ):
     return (DUMP_OPERATION, )
 
-def parseWordAsPorthOperation(word):
-    assert OPERATION_COUNT == 4, "exhaustive handling of operation types in parseWordAsPorthOperation( )"
+def parseTokenAsPorthOperation(token):
+    assert OPERATION_COUNT == 4, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+
+    (filePath, rowNumber, startingPosition, word)= token
 
     if word  == '+':
         return createPlusOperation( )
@@ -46,13 +49,19 @@ def parseWordAsPorthOperation(word):
         return createDumpOperation( )
 
     else:
-        return createPushOperation(int(word))
+        try:
+            return createPushOperation(int(word))
+
+        except ValueError as valueError:
+            print("error in file %s, row number %d and column number %d" % (filePath, rowNumber + 1, startingPosition + 1))
+            print(valueError)
+
+            exit(1)
 
 def parsePorthProgram(programFilePath):
-    with open(programFilePath, "r") as programFile:
-        return [
-            parseWordAsPorthOperation(word) for word in programFile.read( ).split( )
-        ]
+    return [
+        parseTokenAsPorthOperation(token) for token in lexer.lexFile(programFilePath)
+    ]
 
 def leftPopFromList(list):
     return (list[0], list[1:])
