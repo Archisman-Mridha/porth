@@ -22,6 +22,7 @@ MINUS_OPERATION= iota( )
 DUMP_OPERATION= iota( )
 EQUALITY_COMPARISON_OPERATION= iota( )
 IF_OPERATION= iota( )
+ELSE_OPERATION= iota( )
 BLOCK_END_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
@@ -43,11 +44,14 @@ def createEqualityComparisonOperation( ):
 def createIfOperation( ):
     return (IF_OPERATION, )
 
+def createElseOperation( ):
+    return (ELSE_OPERATION, )
+
 def createBlockEndOperation( ):
     return (BLOCK_END_OPERATION, )
 
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 7, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 8, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -65,6 +69,9 @@ def parseTokenAsPorthOperation(token):
 
     elif word == 'if':
         return createIfOperation( )
+
+    elif word == 'else':
+        return createElseOperation( )
 
     elif word == 'end':
         return createBlockEndOperation( )
@@ -154,7 +161,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for index in range(len(program)):
-            assert OPERATION_COUNT == 7, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert OPERATION_COUNT == 8, "exhaustive handling of operation types in compilePorthProgram( )"
 
             instruction= program[index]
 
@@ -219,6 +226,15 @@ def compilePorthProgram(program):
                     test rax, rax
                     jz addr_%d
                     """ % instruction[1]
+                )
+
+            elif instruction[0] == ELSE_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                ;; handling else statement
+                    jmp addr_%d
+                addr_%d:
+                    """ % (instruction[1], index+1)
                 )
 
             elif instruction[0] == BLOCK_END_OPERATION:

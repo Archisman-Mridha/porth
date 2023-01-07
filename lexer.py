@@ -2,7 +2,7 @@ import interpreter
 
 # add reference of end statement in the related if operation
 def resolveCrossReferences(interpretedSourcecode):
-    assert interpreter.OPERATION_COUNT == 7, "exhaustive handling of operation types in getCrossReferences( )"
+    assert interpreter.OPERATION_COUNT == 8, "exhaustive handling of operation types in getCrossReferences( )"
 
     stack= [ ]
 
@@ -12,12 +12,24 @@ def resolveCrossReferences(interpretedSourcecode):
         if operation[0] == interpreter.IF_OPERATION:
             stack.append(index)
 
-        elif operation[0] == interpreter.BLOCK_END_OPERATION:
-            relatedIfOperationIndex= stack.pop( ) # getting index of the if operation which is related to this end statement
-            assert interpretedSourcecode[relatedIfOperationIndex][0] == interpreter.IF_OPERATION, "no if block found for end keyword"
+        elif operation[0] == interpreter.ELSE_OPERATION:
+            relatedIfOperationIndex= stack.pop( ) # getting index of the related if operation
+            assert interpretedSourcecode[relatedIfOperationIndex][0] == interpreter.IF_OPERATION, "`else` can only be used to close if/else blocks"
 
-            # referncing index of the end statement in the related if operation
-            interpretedSourcecode[relatedIfOperationIndex]= (interpreter.IF_OPERATION, index)
+            interpretedSourcecode[relatedIfOperationIndex]= (interpreter.IF_OPERATION, index + 1)
+
+            stack.append(index)
+
+        elif operation[0] == interpreter.BLOCK_END_OPERATION:
+            # can be if or else blocks
+            relatedOperationIndex= stack.pop( )
+
+            if(interpretedSourcecode[relatedOperationIndex][0] == interpreter.IF_OPERATION
+                or interpretedSourcecode[relatedOperationIndex][0] == interpreter.ELSE_OPERATION):
+                    interpretedSourcecode[relatedOperationIndex]= (interpretedSourcecode[relatedOperationIndex][0], index)
+
+            else:
+                raise Exception("`end` can be only be used to close if/else blocks")
 
     return interpretedSourcecode
 

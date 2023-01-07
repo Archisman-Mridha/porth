@@ -69,8 +69,8 @@
                     add rax, rbx
                     push rax
                     
-                    ;; pushing 69 to the stack
-                    push 69
+                    ;; pushing 68 to the stack
+                    push 68
 
                 
                     ;; performing equality comparison operation
@@ -85,7 +85,7 @@
                     ;; handling if block
                     pop rax
                     test rax, rax
-                    jz addr_8
+                    jz addr_9
                     
                     ;; pushing 1 to the stack
                     push 1
@@ -95,8 +95,20 @@
                     pop rdi
                     call dump
                     
+                ;; handling else statement
+                    jmp addr_11
+                addr_9:
+                    
+                    ;; pushing 0 to the stack
+                    push 0
+
+                
+                    ;; performing dump operation
+                    pop rdi
+                    call dump
+                    
                 ;; handling end statement
-                addr_8:
+                addr_11:
                     
 
                     mov rax, 60
