@@ -19,7 +19,7 @@ PUSH_OPERATION= iota(True)
 PLUS_OPERATION= iota( )
 MINUS_OPERATION= iota( )
 DUMP_OPERATION= iota( )
-OPERATIONS_COUNT= iota( )
+OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
     return (PUSH_OPERATION, value)
@@ -33,14 +33,29 @@ def createMinusPlusOperation( ):
 def createDumpOperation( ):
     return (DUMP_OPERATION, )
 
-examplePorthProgram= [
-    createPushOperation(34),
-    createPushOperation(35),
+def parseWordAsPorthOperation(word):
+    assert OPERATION_COUNT == 4, "exhaustive handling of operation types in parseWordAsPorthOperation( )"
 
-    createPlusOperation( ),
+    if word  == '+':
+        return createPlusOperation( )
 
-    createDumpOperation( )
-]
+    elif word == '-':
+        return createMinusPlusOperation( )
+
+    elif word == '.':
+        return createDumpOperation( )
+
+    else:
+        return createPushOperation(int(word))
+
+def parsePorthProgram(programFilePath):
+    with open(programFilePath, "r") as programFile:
+        return [
+            parseWordAsPorthOperation(word) for word in programFile.read( ).split( )
+        ]
+
+def leftPopFromList(list):
+    return (list[0], list[1:])
 
 def compilePorthProgram(program):
     with open("output.asm", "w") as assemblyOutputFile:
@@ -109,7 +124,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for instruction in program:
-            assert OPERATIONS_COUNT == 4, "exhaustive handling of operation types in compilation"
+            assert OPERATION_COUNT == 4, "exhaustive handling of operation types in compilePorthProgram( )"
 
             if instruction[0] == PUSH_OPERATION:
                 assemblyOutputFile.write("""
@@ -164,4 +179,13 @@ def compilePorthProgram(program):
     subprocess.call(["./compile.sh"])
 
 if __name__ == "__main__":
-    compilePorthProgram(examplePorthProgram)
+    argv= sys.argv
+    (_, argv)= leftPopFromList(argv)
+
+    if len(argv) < 1:
+        print("ERROR: no porth file path provided")
+
+    (porthFilePath, argv)= leftPopFromList(argv)
+
+    sourcecode= parsePorthProgram(porthFilePath)
+    compilePorthProgram(sourcecode)

@@ -73,6 +73,24 @@
                     pop rdi
                     call dump
                     
+                    ;; pushing 500 to the stack
+                    push 500
+
+                
+                    ;; pushing 80 to the stack
+                    push 80
+
+                
+                    ;; performing minus operation
+                    pop rax
+                    pop rbx
+                    sub rbx, rax
+                    push rbx
+                    
+                    ;; performing dump operation
+                    pop rdi
+                    call dump
+                    
 
                     mov rax, 60
                     mov rdi, 0
