@@ -21,6 +21,8 @@ PLUS_OPERATION= iota( )
 MINUS_OPERATION= iota( )
 DUMP_OPERATION= iota( )
 EQUALITY_COMPARISON_OPERATION= iota( )
+IF_OPERATION= iota( )
+BLOCK_END_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -38,8 +40,14 @@ def createDumpOperation( ):
 def createEqualityComparisonOperation( ):
     return (EQUALITY_COMPARISON_OPERATION, )
 
+def createIfOperation( ):
+    return (IF_OPERATION, )
+
+def createBlockEndOperation( ):
+    return (BLOCK_END_OPERATION, )
+
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 5, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 7, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -55,6 +63,12 @@ def parseTokenAsPorthOperation(token):
     elif word == '=':
         return createEqualityComparisonOperation( )
 
+    elif word == 'if':
+        return createIfOperation( )
+
+    elif word == 'end':
+        return createBlockEndOperation( )
+
     else:
         try:
             return createPushOperation(int(word))
@@ -63,12 +77,12 @@ def parseTokenAsPorthOperation(token):
             print("error in file %s, row number %d and column number %d" % (filePath, rowNumber + 1, startingPosition + 1))
             print(valueError)
 
-            exit(1)
+            sys.exit(1)
 
 def parsePorthProgram(programFilePath):
-    return [
-        parseTokenAsPorthOperation(token) for token in lexer.lexFile(programFilePath)
-    ]
+    return lexer.resolveCrossReferences(
+        [ parseTokenAsPorthOperation(token) for token in lexer.lexFile(programFilePath) ]
+    )
 
 def leftPopFromList(list):
     return (list[0], list[1:])
@@ -139,8 +153,10 @@ def compilePorthProgram(program):
 
         #! generating assembly code for the stack operations of the submitted porth code
 
-        for instruction in program:
-            assert OPERATION_COUNT == 5, "exhaustive handling of operation types in compilePorthProgram( )"
+        for index in range(len(program)):
+            assert OPERATION_COUNT == 7, "exhaustive handling of operation types in compilePorthProgram( )"
+
+            instruction= program[index]
 
             if instruction[0] == PUSH_OPERATION:
                 assemblyOutputFile.write("""
@@ -189,7 +205,28 @@ def compilePorthProgram(program):
                     pop rbx
                     cmp rax, rbx
                     cmove rcx, rdx
+                    push rcx
                     """
+                )
+
+            elif instruction[0] == IF_OPERATION:
+                assert len(instruction) >= 2, "end statement not found for if block"
+
+                assemblyOutputFile.write(
+                    """
+                    ;; handling if block
+                    pop rax
+                    test rax, rax
+                    jz addr_%d
+                    """ % instruction[1]
+                )
+
+            elif instruction[0] == BLOCK_END_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                ;; handling end statement
+                addr_%d:
+                    """ % index
                 )
 
             else:
@@ -216,5 +253,5 @@ if __name__ == "__main__":
 
     (porthFilePath, argv)= leftPopFromList(argv)
 
-    sourcecode= parsePorthProgram(porthFilePath)
-    compilePorthProgram(sourcecode)
+    interpretedSourcecode= parsePorthProgram(porthFilePath)
+    compilePorthProgram(interpretedSourcecode)

@@ -80,10 +80,23 @@
                     pop rbx
                     cmp rax, rbx
                     cmove rcx, rdx
+                    push rcx
                     
+                    ;; handling if block
+                    pop rax
+                    test rax, rax
+                    jz addr_8
+                    
+                    ;; pushing 1 to the stack
+                    push 1
+
+                
                     ;; performing dump operation
                     pop rdi
                     call dump
+                    
+                ;; handling end statement
+                addr_8:
                     
 
                     mov rax, 60
