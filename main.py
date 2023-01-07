@@ -20,6 +20,7 @@ PUSH_OPERATION= iota(True)
 PLUS_OPERATION= iota( )
 MINUS_OPERATION= iota( )
 DUMP_OPERATION= iota( )
+EQUALITY_COMPARISON_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -34,8 +35,11 @@ def createMinusPlusOperation( ):
 def createDumpOperation( ):
     return (DUMP_OPERATION, )
 
+def createEqualityComparisonOperation( ):
+    return (EQUALITY_COMPARISON_OPERATION, )
+
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 4, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 5, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -47,6 +51,9 @@ def parseTokenAsPorthOperation(token):
 
     elif word == '.':
         return createDumpOperation( )
+
+    elif word == '=':
+        return createEqualityComparisonOperation( )
 
     else:
         try:
@@ -74,7 +81,7 @@ def compilePorthProgram(program):
             """
                 segment .text
 
-                ;; pops top value out of stack and prints it to the console
+                ;;* pops top value out of stack and prints it to the console
                 dump:
                     push    rbp
                     mov     rbp, rsp
@@ -133,7 +140,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for instruction in program:
-            assert OPERATION_COUNT == 4, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert OPERATION_COUNT == 5, "exhaustive handling of operation types in compilePorthProgram( )"
 
             if instruction[0] == PUSH_OPERATION:
                 assemblyOutputFile.write("""
@@ -169,6 +176,19 @@ def compilePorthProgram(program):
                     ;; performing dump operation
                     pop rdi
                     call dump
+                    """
+                )
+
+            elif instruction[0] == EQUALITY_COMPARISON_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                    ;; performing equality comparison operation
+                    mov rcx, 0
+                    mov rdx, 1
+                    pop rax
+                    pop rbx
+                    cmp rax, rbx
+                    cmove rcx, rdx
                     """
                 )
 

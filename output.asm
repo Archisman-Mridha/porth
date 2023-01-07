@@ -1,7 +1,7 @@
 
                 segment .text
 
-                ;; pops top value out of stack and prints it to the console
+                ;;* pops top value out of stack and prints it to the console
                 dump:
                     push    rbp
                     mov     rbp, rsp
@@ -69,23 +69,17 @@
                     add rax, rbx
                     push rax
                     
-                    ;; performing dump operation
-                    pop rdi
-                    call dump
-                    
-                    ;; pushing 500 to the stack
-                    push 500
+                    ;; pushing 69 to the stack
+                    push 69
 
                 
-                    ;; pushing 80 to the stack
-                    push 80
-
-                
-                    ;; performing minus operation
+                    ;; performing equality comparison operation
+                    mov rcx, 0
+                    mov rdx, 1
                     pop rax
                     pop rbx
-                    sub rbx, rax
-                    push rbx
+                    cmp rax, rbx
+                    cmove rcx, rdx
                     
                     ;; performing dump operation
                     pop rdi
