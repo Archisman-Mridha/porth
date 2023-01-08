@@ -63,77 +63,17 @@
                 
                     addr_1:
                 
-                    addr_2:
-                
-                        ;; performing dup operation
-                        pop rax
-                        push rax
-                        push rax
-                    
-                    addr_3:
-                
-                        ;; pushing 0 to the stack
-                        push 0
-
-                
-                    addr_4:
-                
-                        ;; performing greater than comparison operation
-                        mov rcx, 0
-                        mov rdx, 1
-                        pop rbx
-                        pop rax
-                        cmp rax, rbx
-                        cmovg rcx, rdx
-                        push rcx
-                    
-                    addr_5:
-                
-                        ;; performing do operation
-                        pop rax
-                        test rax, rax
-                        jz addr_11
-                    
-                    addr_6:
-                
-                        ;; performing dup operation
-                        pop rax
-                        push rax
-                        push rax
-                    
-                    addr_7:
-                
                         ;; performing dump operation
                         pop rdi
                         call dump
                     
-                    addr_8:
+                    addr_2:
                 
                         ;; pushing 1 to the stack
                         push 1
 
                 
-                    addr_9:
-                
-                        ;; performing minus operation
-                        pop rax
-                        pop rbx
-                        sub rbx, rax
-                        push rbx
-                    
-                    addr_10:
-                
-                        ;; handling end statement
-                    
-                        jmp addr_1
-                        
-                    addr_11:
-                
-                        ;; pushing 420 to the stack
-                        push 420
-
-                
-                    addr_12:
+                    addr_3:
                 
                         ;; performing dump operation
                         pop rdi

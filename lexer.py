@@ -88,5 +88,5 @@ def lexFile(filePath):
         for (lineNumber, line) in enumerate(file.readlines( )):
 
             # iterating through words in the line
-            for (startingPosition, word) in lexLine(line):
+            for (startingPosition, word) in lexLine(line.split('//')[0]):
                 yield (filePath, lineNumber, startingPosition, word)
