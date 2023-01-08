@@ -1,5 +1,9 @@
 
-                segment .text
+            segment .bss
+                ;;* allocating some memory where user can read or write data
+                mem: resb 500000
+
+            segment .text
 
                 ;;* pops top value out of stack and prints it to the console
                 dump:
@@ -57,23 +61,9 @@
             
                     addr_0:
                 
-                        ;; pushing 10 to the stack
-                        push 10
-
-                
-                    addr_1:
-                
-                        ;; performing dump operation
-                        pop rdi
-                        call dump
+                        push mem
                     
-                    addr_2:
-                
-                        ;; pushing 1 to the stack
-                        push 1
-
-                
-                    addr_3:
+                    addr_1:
                 
                         ;; performing dump operation
                         pop rdi

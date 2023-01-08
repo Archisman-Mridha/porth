@@ -28,6 +28,7 @@ DUP_OPERATION= iota( ) #* `dup` operation, creates a duplicate of the value at t
 GREATER_THAN_COMPARISON_OPERATION= iota( )
 WHILE_OPERATION= iota( )
 DO_OPERATION= iota( )
+MEM_OPERATION= iota( ) #* `mem` operation, pushes the beginning of the memory where you can read and write, to the stack
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -66,8 +67,11 @@ def createDoOperation( ):
 def createWhileOperation( ):
     return (WHILE_OPERATION, )
 
+def createMemOperation( ):
+    return (MEM_OPERATION, )
+
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 12, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 13, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -104,6 +108,9 @@ def parseTokenAsPorthOperation(token):
     elif word == 'while':
         return createWhileOperation( )
 
+    elif word == 'mem':
+        return createMemOperation( )
+
     else:
         try:
             return createPushOperation(int(word))
@@ -128,7 +135,11 @@ def compilePorthProgram(program):
         #* beginning text section of the compiled assembly program and defining the entrypoint
         assemblyOutputFile.write(
             """
-                segment .text
+            segment .bss
+                ;;* allocating some memory where user can read or write data
+                mem: resb 500000
+
+            segment .text
 
                 ;;* pops top value out of stack and prints it to the console
                 dump:
@@ -189,7 +200,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for index in range(len(program)):
-            assert OPERATION_COUNT == 12, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert OPERATION_COUNT == 13, "exhaustive handling of operation types in compilePorthProgram( )"
 
             instruction= program[index]
 
@@ -323,6 +334,13 @@ def compilePorthProgram(program):
                         test rax, rax
                         jz addr_%d
                     """ % instruction[1]
+                )
+
+            elif instruction[0] == MEM_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                        push mem
+                    """
                 )
 
             else:
