@@ -81,8 +81,8 @@
                     
                     addr_3:
                 
-                        ;; pushing 69 to the stack
-                        push 69
+                        ;; pushing 70 to the stack
+                        push 70
 
                 
                     addr_4:
@@ -118,7 +118,7 @@
                     addr_8:
                 
                         ;; handling else statement
-                        jmp addr_9
+                        jmp addr_11
                     
                     addr_9:
                 

@@ -150,7 +150,7 @@ def compilePorthProgram(program):
                     """
                         ;; handling else statement
                         jmp addr_%d
-                    """ % (instruction[1], index+1)
+                    """ % (instruction[1])
                 )
 
             elif instruction[0] == operations.BLOCK_END_OPERATION:
