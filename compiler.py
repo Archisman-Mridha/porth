@@ -1,7 +1,10 @@
 import operations
 import subprocess
+import os
 
 def compilePorthProgram(program):
+    os.chdir("./output")
+
     with open("output.asm", "w") as assemblyOutputFile:
 
         #* beginning text section of the compiled assembly program and defining the entrypoint
@@ -248,5 +251,7 @@ def compilePorthProgram(program):
             """
         )
 
-    subprocess.call(["chmod", "+x", "./compile.sh"])
-    subprocess.call(["./compile.sh"])
+    os.chdir("../")
+
+    subprocess.call(["chmod", "+x", "./scripts/compile.sh"])
+    subprocess.call(["./scripts/compile.sh"])
