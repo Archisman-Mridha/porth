@@ -1,1 +1,7 @@
-mem dump
+// mem points to the beginning of the memory buffer dedicated to reading and writing data by the user
+
+// writing data to the buffer
+mem 97 .
+
+// reading data from the buffer and dumping it from the stack
+mem , dump

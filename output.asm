@@ -65,6 +65,31 @@
                     
                     addr_1:
                 
+                        ;; pushing 97 to the stack
+                        push 97
+
+                
+                    addr_2:
+                
+                        ;; handling write to mem operation
+                        pop rbx
+                        pop rax
+                        mov [rax], bl
+                    
+                    addr_3:
+                
+                        push mem
+                    
+                    addr_4:
+                
+                        ;; handling read from mem operation
+                        pop rax
+                        xor rbx, rbx
+                        mov bl, [rax]
+                        push rbx
+                    
+                    addr_5:
+                
                         ;; performing dump operation
                         pop rdi
                         call dump

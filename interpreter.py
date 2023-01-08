@@ -29,6 +29,8 @@ GREATER_THAN_COMPARISON_OPERATION= iota( )
 WHILE_OPERATION= iota( )
 DO_OPERATION= iota( )
 MEM_OPERATION= iota( ) #* `mem` operation, pushes the beginning of the memory where you can read and write, to the stack
+WRITE_TO_MEM_OPERATION= iota( )
+READ_FROM_MEM_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -70,8 +72,14 @@ def createWhileOperation( ):
 def createMemOperation( ):
     return (MEM_OPERATION, )
 
+def createWriteToMemOperation( ):
+    return (WRITE_TO_MEM_OPERATION, )
+
+def createReadFromMemOperation( ):
+    return (READ_FROM_MEM_OPERATION, )
+
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 13, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 15, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -110,6 +118,12 @@ def parseTokenAsPorthOperation(token):
 
     elif word == 'mem':
         return createMemOperation( )
+
+    elif word == ',':
+        return createReadFromMemOperation( )
+
+    elif word == '.':
+        return createWriteToMemOperation( )
 
     else:
         try:
@@ -200,7 +214,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for index in range(len(program)):
-            assert OPERATION_COUNT == 13, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert OPERATION_COUNT == 15, "exhaustive handling of operation types in compilePorthProgram( )"
 
             instruction= program[index]
 
@@ -340,6 +354,27 @@ def compilePorthProgram(program):
                 assemblyOutputFile.write(
                     """
                         push mem
+                    """
+                )
+
+            elif instruction[0] == READ_FROM_MEM_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                        ;; handling read from mem operation
+                        pop rax
+                        xor rbx, rbx
+                        mov bl, [rax]
+                        push rbx
+                    """
+                )
+
+            elif instruction[0] == WRITE_TO_MEM_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                        ;; handling write to mem operation
+                        pop rbx
+                        pop rax
+                        mov [rax], bl
                     """
                 )
 
