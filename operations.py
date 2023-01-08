@@ -1,15 +1,4 @@
-iotaCounter= 0
-
-def iota(resetCounter= False):
-
-    global iotaCounter
-    if(resetCounter):
-        iotaCounter= 0
-
-    currentValue= iotaCounter
-    iotaCounter += 1
-
-    return currentValue
+from utils import iota
 
 #* stack operations
 PUSH_OPERATION= iota(True)
@@ -27,6 +16,7 @@ DO_OPERATION= iota( )
 MEM_OPERATION= iota( ) #* `mem` operation, pushes the beginning of the memory where you can read and write, to the stack
 WRITE_TO_MEM_OPERATION= iota( )
 READ_FROM_MEM_OPERATION= iota( )
+SYSCALL_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -73,3 +63,6 @@ def createWriteToMemOperation( ):
 
 def createReadFromMemOperation( ):
     return (READ_FROM_MEM_OPERATION, )
+
+def createSyscallOperation( ):
+    return (SYSCALL_OPERATION, )

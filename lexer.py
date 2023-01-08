@@ -2,7 +2,7 @@ import operations
 
 # add reference of end statement in the related if operation
 def resolveCrossReferences(interpretedSourcecode):
-    assert operations.OPERATION_COUNT == 15, "exhaustive handling of operation types in getCrossReferences( )"
+    assert operations.OPERATION_COUNT == 16, "exhaustive handling of operation types in getCrossReferences( )"
 
     stack= [ ]
 

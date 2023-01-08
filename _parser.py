@@ -3,7 +3,7 @@ import operations
 import sys
 
 def parseTokenAsPorthOperation(token):
-    assert operations.OPERATION_COUNT == 15, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert operations.OPERATION_COUNT == 16, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -48,6 +48,9 @@ def parseTokenAsPorthOperation(token):
 
     elif word == '.':
         return operations.createWriteToMemOperation( )
+
+    elif word == 'syscall':
+        return operations.createSyscallOperation( )
 
     else:
         try:
