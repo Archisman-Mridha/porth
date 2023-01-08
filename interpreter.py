@@ -81,7 +81,7 @@ def parseTokenAsPorthOperation(token):
     elif word == '-':
         return createMinusPlusOperation( )
 
-    elif word == '.':
+    elif word == 'dump':
         return createDumpOperation( )
 
     elif word == '=':
