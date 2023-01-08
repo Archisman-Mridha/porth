@@ -2,7 +2,7 @@ import interpreter
 
 # add reference of end statement in the related if operation
 def resolveCrossReferences(interpretedSourcecode):
-    assert interpreter.OPERATION_COUNT == 10, "exhaustive handling of operation types in getCrossReferences( )"
+    assert interpreter.OPERATION_COUNT == 12, "exhaustive handling of operation types in getCrossReferences( )"
 
     stack= [ ]
 
@@ -20,16 +20,39 @@ def resolveCrossReferences(interpretedSourcecode):
 
             stack.append(index)
 
+        elif operation[0] == interpreter.WHILE_OPERATION:
+            stack.append(index)
+
+        elif operation[0] == interpreter.DO_OPERATION:
+            relatedWhileOperationIndex= stack.pop( )
+
+            # referencing related while operation
+            interpretedSourcecode[index]= (interpreter.DO_OPERATION, relatedWhileOperationIndex)
+
+            stack.append(index)
+
         elif operation[0] == interpreter.BLOCK_END_OPERATION:
-            # can be if or else blocks
             relatedOperationIndex= stack.pop( )
 
+            #* in case of if/else blocks
             if(interpretedSourcecode[relatedOperationIndex][0] == interpreter.IF_OPERATION
                 or interpretedSourcecode[relatedOperationIndex][0] == interpreter.ELSE_OPERATION):
                     interpretedSourcecode[relatedOperationIndex]= (interpretedSourcecode[relatedOperationIndex][0], index)
 
+                    # from the end statement we will continue with the next instructions
+                    interpretedSourcecode[index]= (interpreter.BLOCK_END_OPERATION, index + 1)
+
+            #* in case of `do` operation in while blocks
+            elif interpretedSourcecode[relatedOperationIndex][0] == interpreter.DO_OPERATION:
+                assert len(interpretedSourcecode[relatedOperationIndex]) >= 2, "related `do` operation must have refernce to the `while` block"
+
+                # from the `end` statement we will again jump to the `while` statement
+                interpretedSourcecode[index]= (interpreter.BLOCK_END_OPERATION, interpretedSourcecode[relatedOperationIndex][1])
+
+                interpretedSourcecode[relatedOperationIndex]= (interpreter.DO_OPERATION, index + 1)
+
             else:
-                raise Exception("`end` can be only be used to close if/else blocks")
+                raise Exception("`end` can be only be used to close `if/else` or `do` blocks")
 
     return interpretedSourcecode
 

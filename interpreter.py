@@ -26,6 +26,8 @@ ELSE_OPERATION= iota( )
 BLOCK_END_OPERATION= iota( )
 DUP_OPERATION= iota( ) #* `dup` operation, creates a duplicate of the value at the top of the stack and pushes that duplicate to the top of the stack
 GREATER_THAN_COMPARISON_OPERATION= iota( )
+WHILE_OPERATION= iota( )
+DO_OPERATION= iota( )
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):
@@ -58,8 +60,14 @@ def createDupOperation( ):
 def createGreaterThanComparisonOperation( ):
     return (GREATER_THAN_COMPARISON_OPERATION, )
 
+def createDoOperation( ):
+    return (DO_OPERATION, )
+
+def createWhileOperation( ):
+    return (WHILE_OPERATION, )
+
 def parseTokenAsPorthOperation(token):
-    assert OPERATION_COUNT == 10, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
+    assert OPERATION_COUNT == 12, "exhaustive handling of operation types in parseTokenAsPorthOperation( )"
 
     (filePath, rowNumber, startingPosition, word)= token
 
@@ -89,6 +97,12 @@ def parseTokenAsPorthOperation(token):
 
     elif word == '>':
         return createGreaterThanComparisonOperation( )
+
+    elif word == 'do':
+        return createDoOperation( )
+
+    elif word == 'while':
+        return createWhileOperation( )
 
     else:
         try:
@@ -175,58 +189,64 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for index in range(len(program)):
-            assert OPERATION_COUNT == 10, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert OPERATION_COUNT == 12, "exhaustive handling of operation types in compilePorthProgram( )"
 
             instruction= program[index]
 
+            assemblyOutputFile.write(
+                """
+                    addr_%d:
+                """ % index
+            )
+
             if instruction[0] == PUSH_OPERATION:
                 assemblyOutputFile.write("""
-                    ;; pushing %d to the stack
-                    push %d\n
+                        ;; pushing %d to the stack
+                        push %d\n
                 """ % (instruction[1], instruction[1]))
             
             elif instruction[0] == PLUS_OPERATION:
                 assemblyOutputFile.write(
                     """
-                    ;; performing plus operation
-                    pop rax
-                    pop rbx
-                    add rax, rbx
-                    push rax
+                        ;; performing plus operation
+                        pop rax
+                        pop rbx
+                        add rax, rbx
+                        push rax
                     """
                 )
 
             elif instruction[0] == MINUS_OPERATION:
                 assemblyOutputFile.write(
                     """
-                    ;; performing minus operation
-                    pop rax
-                    pop rbx
-                    sub rbx, rax
-                    push rbx
+                        ;; performing minus operation
+                        pop rax
+                        pop rbx
+                        sub rbx, rax
+                        push rbx
                     """
                 )
 
             elif instruction[0] == DUMP_OPERATION:
                 assemblyOutputFile.write(
                     """
-                    ;; performing dump operation
-                    pop rdi
-                    call dump
+                        ;; performing dump operation
+                        pop rdi
+                        call dump
                     """
                 )
 
             elif instruction[0] == EQUALITY_COMPARISON_OPERATION:
                 assemblyOutputFile.write(
                     """
-                    ;; performing equality comparison operation
-                    mov rcx, 0
-                    mov rdx, 1
-                    pop rbx
-                    pop rax
-                    cmp rax, rbx
-                    cmove rcx, rdx
-                    push rcx
+                        ;; performing equality comparison operation
+                        mov rcx, 0
+                        mov rdx, 1
+                        pop rbx
+                        pop rax
+                        cmp rax, rbx
+                        cmove rcx, rdx
+                        push rcx
                     """
                 )
 
@@ -235,52 +255,74 @@ def compilePorthProgram(program):
 
                 assemblyOutputFile.write(
                     """
-                    ;; handling if block
-                    pop rax
-                    test rax, rax
-                    jz addr_%d
+                        ;; handling if block
+                        pop rax
+                        test rax, rax
+                        jz addr_%d
                     """ % instruction[1]
                 )
 
             elif instruction[0] == ELSE_OPERATION:
                 assemblyOutputFile.write(
                     """
-                ;; handling else statement
-                    jmp addr_%d
-                addr_%d:
+                        ;; handling else statement
+                        jmp addr_%d
                     """ % (instruction[1], index+1)
                 )
 
             elif instruction[0] == BLOCK_END_OPERATION:
+                assert len(instruction) >= 2, "end statement should have reference to the next instruction to jump to"
+
                 assemblyOutputFile.write(
                     """
-                ;; handling end statement
-                addr_%d:
-                    """ % index
+                        ;; handling end statement
+                    """
                 )
+
+                if index + 1 != instruction[1]:
+                    assemblyOutputFile.write(
+                        """
+                        jmp addr_%d
+                        """ % instruction[1]
+                    )
 
             elif instruction[0] == DUP_OPERATION:
                 assemblyOutputFile.write(
                     """
-                    ;; performing dup operation
-                    pop rax
-                    push rax
-                    push rax
+                        ;; performing dup operation
+                        pop rax
+                        push rax
+                        push rax
                     """
                 )
 
             elif instruction[0] == GREATER_THAN_COMPARISON_OPERATION:
                 assemblyOutputFile.write(
                     """
-                    ;; performing greater than comparison operation
-                    mov rcx, 0
-                    mov rdx, 1
-                    pop rbx
-                    pop rax
-                    cmp rax, rbx
-                    cmovg rcx, rdx
-                    push rcx
+                        ;; performing greater than comparison operation
+                        mov rcx, 0
+                        mov rdx, 1
+                        pop rbx
+                        pop rax
+                        cmp rax, rbx
+                        cmovg rcx, rdx
+                        push rcx
                     """
+                )
+
+            elif instruction[0] == WHILE_OPERATION:
+                pass
+
+            elif instruction[0] == DO_OPERATION:
+                assert len(instruction) >= 2, "do operation doesn't have reference to the end statement"
+
+                assemblyOutputFile.write(
+                    """
+                        ;; performing do operation
+                        pop rax
+                        test rax, rax
+                        jz addr_%d
+                    """ % instruction[1]
                 )
 
             else:
