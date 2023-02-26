@@ -75,7 +75,7 @@ def compilePorthProgram(program):
         #! generating assembly code for the stack operations of the submitted porth code
 
         for index in range(len(program)):
-            assert operations.OPERATION_COUNT == 15, "exhaustive handling of operation types in compilePorthProgram( )"
+            assert operations.OPERATION_COUNT == 16, "exhaustive handling of operation types in compilePorthProgram( )"
 
             instruction= program[index]
 
@@ -236,6 +236,18 @@ def compilePorthProgram(program):
                         pop rbx
                         pop rax
                         mov [rax], bl
+                    """
+                )
+
+            elif instruction[0] == operations.SYSCALL_OPERATION:
+                assemblyOutputFile.write(
+                    """
+                        ;; performing a syscall
+                        pop rax ;; syscall code
+                        pop rdi
+                        pop rsi
+                        pop rdx
+                        syscall
                     """
                 )
 

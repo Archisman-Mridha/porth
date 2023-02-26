@@ -16,7 +16,7 @@ DO_OPERATION= iota( )
 MEM_OPERATION= iota( ) #* `mem` operation, pushes the beginning of the memory where you can read and write, to the stack
 WRITE_TO_MEM_OPERATION= iota( )
 READ_FROM_MEM_OPERATION= iota( )
-SYSCALL_OPERATION= iota( )
+SYSCALL_OPERATION= iota( ) #! incomplete support
 OPERATION_COUNT= iota( )
 
 def createPushOperation(value):

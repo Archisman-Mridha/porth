@@ -61,14 +61,12 @@
             
                     addr_0:
                 
-                        ;; pushing 34 to the stack
-                        push 34
-
-                
+                        push mem
+                    
                     addr_1:
                 
-                        ;; pushing 35 to the stack
-                        push 35
+                        ;; pushing 0 to the stack
+                        push 0
 
                 
                     addr_2:
@@ -81,60 +79,47 @@
                     
                     addr_3:
                 
-                        ;; pushing 70 to the stack
-                        push 70
+                        ;; pushing 97 to the stack
+                        push 97
 
                 
                     addr_4:
                 
-                        ;; performing equality comparison operation
-                        mov rcx, 0
-                        mov rdx, 1
+                        ;; handling write to mem operation
                         pop rbx
                         pop rax
-                        cmp rax, rbx
-                        cmove rcx, rdx
-                        push rcx
+                        mov [rax], bl
                     
                     addr_5:
-                
-                        ;; handling if block
-                        pop rax
-                        test rax, rax
-                        jz addr_9
-                    
-                    addr_6:
                 
                         ;; pushing 1 to the stack
                         push 1
 
                 
+                    addr_6:
+                
+                        push mem
+                    
                     addr_7:
                 
-                        ;; performing dump operation
-                        pop rdi
-                        call dump
-                    
-                    addr_8:
-                
-                        ;; handling else statement
-                        jmp addr_11
-                    
-                    addr_9:
-                
-                        ;; pushing 0 to the stack
-                        push 0
+                        ;; pushing 1 to the stack
+                        push 1
 
                 
-                    addr_10:
+                    addr_8:
                 
-                        ;; performing dump operation
+                        ;; pushing 1 to the stack
+                        push 1
+
+                
+                    addr_9:
+                
+                        ;; performing a syscall
+                        pop rax ;; syscall code
                         pop rdi
-                        call dump
-                    
-                    addr_11:
-                
-                        ;; handling end statement
+                        pop rsi
+                        pop rdx
+                        syscall
                     
 
                     mov rax, 60

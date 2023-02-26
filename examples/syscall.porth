@@ -1,0 +1,9 @@
+mem 0 + 97 . // writing 'a' into the buffer
+
+// 3 arguments for the syscall
+1 // the standard ouptut
+mem // buffer
+1 // number of characters to be printed
+
+1 // syscall code
+syscall // performing the syscall
